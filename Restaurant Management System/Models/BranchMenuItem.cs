@@ -1,0 +1,16 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Restaurant_Management_System.Models
+{
+    public class BranchMenuItem
+    {
+        public int BranchId { get; set; }
+        public int ItemId { get; set; }
+        public decimal? PriceOverride { get; set; }
+        public bool IsAvailable { get; set; } = true;
+    }
+}
