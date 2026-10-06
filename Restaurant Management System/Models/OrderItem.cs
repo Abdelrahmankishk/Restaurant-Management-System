@@ -8,6 +8,6 @@
         public int Quantity { get; set; }
         public decimal UnitPrice { get; set; }
         public string? SpecialNotes { get; set; }
-        public List<int> SelectedAddOns { get; set; } = new();
+        public List<int> SelectedAddOnIds { get; set; } = new();
     }
 }

@@ -13,6 +13,6 @@ namespace Restaurant_Management_System.Models
         public int OrderId { get; set; }
         public DateTime Date { get; set; }
         public int Rating { get; set; }
-        public string Comments { get; set; } = "";
+        public string Comments { get; set; } = string.Empty;
     }
 }

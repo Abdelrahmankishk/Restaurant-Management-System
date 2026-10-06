@@ -18,7 +18,7 @@ namespace Restaurant_Management_System.Models
         public int BranchId { get; set; }
         public int HandledByEmployeeId { get; set; }
         public int CustomerId { get; set; }
-        public string? Address { get; set; }
+        public string? DeliveryAddress { get; set; }
         public List<OrderItem> OrderItems { get; set; } = new();
     }
 }

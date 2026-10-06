@@ -11,8 +11,8 @@ namespace Restaurant_Management_System.Models
     {
         public int DeliveryId { get; set; }
         public int OrderId { get; set; }
-        public string DeliveryAddress { get; set; } = "";
-        public DateTime DeliveryTime { get; set; }
+        public string DeliveryAddress { get; set; } = string.Empty;
+        public DateTime? DeliveryTime { get; set; }
         public DeliveryStatus Status { get; set; } = DeliveryStatus.AwaitingAssignment;
         public int? DeliveryStaffId { get; set; }
         public string? FailureReason { get; set; }
