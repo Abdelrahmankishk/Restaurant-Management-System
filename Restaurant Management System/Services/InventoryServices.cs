@@ -64,5 +64,8 @@ namespace Restaurant_Management_System.Services
                 }
             }
         }
+
+        public static bool IsSufficient(int branchId, List<OrderItem> items) => GetShortfalls(branchId, items).Count == 0;
+
     }
 }
