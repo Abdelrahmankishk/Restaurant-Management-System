@@ -35,5 +35,34 @@ namespace Restaurant_Management_System.Services
             }
             return shortfalls;
         }
+
+        public static void DeductInventory(int branchId, List<OrderItem> items)
+        {
+            var requiredQuantities = new Dictionary<int, double>();
+            foreach (var item in items)
+            {
+                var recipeItems = DataSeeder.RecipeItems.Where(ri => ri.MenuItemId == item.ItemId);
+                foreach (var recipeItem in recipeItems)
+                {
+                    if (!requiredQuantities.ContainsKey(recipeItem.IngredientId))
+                    {
+                        requiredQuantities[recipeItem.IngredientId] = 0;
+                    }
+                    requiredQuantities[recipeItem.IngredientId] += recipeItem.QuantityRequired * item.Quantity;
+                }
+            }
+            foreach (var (ingredientId, quantity) in requiredQuantities)
+            {
+                var inventoryItem = DataSeeder.BranchInventories.FirstOrDefault(x => x.BranchId == branchId && x.IngredientId == ingredientId);
+                if (inventoryItem != null)
+                {
+                    if(inventoryItem.CurrentQuantity < quantity)
+                    {
+                        throw new InvalidOperationException($"Not enough inventory for ingredient {ingredientId} in branch {branchId}");
+                    }
+                    inventoryItem.CurrentQuantity -= quantity;
+                }
+            }
+        }
     }
 }
