@@ -61,6 +61,24 @@ namespace Restaurant_Management_System.Services
             }
         }
 
+        public static void RestockInventory(int branchId,int IngredientId, double Quantity)
+        {
 
+                var inventoryItem = DataSeeder.BranchInventories.FirstOrDefault(x => x.BranchId == branchId && x.IngredientId == IngredientId);
+                if (inventoryItem != null)
+                {
+                    inventoryItem.CurrentQuantity += Quantity;
+                }
+                else 
+                {
+                    DataSeeder.BranchInventories.Add(new BranchInventory        // If the inventory item doesn't exist in the branch, add it with the specified quantity
+                    {
+                        BranchId = branchId,
+                        IngredientId = IngredientId,
+                        CurrentQuantity = Quantity
+                    });                 
+                }
+            
+        }
     }
 }
