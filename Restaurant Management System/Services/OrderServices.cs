@@ -31,7 +31,7 @@ namespace Restaurant_Management_System.Services
             var branch = DataSeeder.Branches.FirstOrDefault(b => b.BranchId == BranchId);
             if (branch is null)
                 return (false, "Branch not found");
-
+            
             //3.Delivery orders require delivery address
             if (orderType == OrderType.Delivery && string.IsNullOrWhiteSpace(deliveryAddress))
                 return (false, "Delivery orders require a delivery address");

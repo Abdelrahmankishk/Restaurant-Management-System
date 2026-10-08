@@ -1,4 +1,5 @@
 ﻿using Restaurant_Management_System.Models;
+using Restaurant_Management_System.Models.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -109,13 +110,13 @@ namespace Restaurant_Management_System.Helpers
             // ─── Ingredients ─────────────────────────────────────────────────────────
             Ingredients.AddRange(new[]
             {
-            new Ingredient { IngredientId = 1, Name = "Chicken",      Unit = "kg"     },
-            new Ingredient { IngredientId = 2, Name = "Flour",        Unit = "kg"     },
-            new Ingredient { IngredientId = 3, Name = "Tomato Sauce", Unit = "liter"  },
-            new Ingredient { IngredientId = 4, Name = "Cheese",       Unit = "kg"     },
-            new Ingredient { IngredientId = 5, Name = "Beef Patty",   Unit = "piece"  },
-            new Ingredient { IngredientId = 6, Name = "Lettuce",      Unit = "kg"     },
-            new Ingredient { IngredientId = 7, Name = "Chocolate",    Unit = "kg"     }
+            new Ingredient { IngredientId = 1, Name = "Chicken",      Unit = UnitTypes.Kilogram   },
+            new Ingredient { IngredientId = 2, Name = "Flour",        Unit = UnitTypes.Kilogram     },
+            new Ingredient { IngredientId = 3, Name = "Tomato Sauce", Unit = UnitTypes.Liter  },
+            new Ingredient { IngredientId = 4, Name = "Cheese",       Unit = UnitTypes.Kilogram     },
+            new Ingredient { IngredientId = 5, Name = "Beef Patty",   Unit = UnitTypes.Piece  },
+            new Ingredient { IngredientId = 6, Name = "Lettuce",      Unit = UnitTypes.Kilogram     },
+            new Ingredient { IngredientId = 7, Name = "Chocolate",    Unit = UnitTypes.Kilogram     }
         });
 
             // ─── Branch Inventory ─────────────────────────────────────────────────────
