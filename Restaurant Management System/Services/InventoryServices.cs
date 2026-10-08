@@ -10,33 +10,8 @@ namespace Restaurant_Management_System.Services
 {
     public static class InventoryServices
     {
-        public static Dictionary<int,double> GetShortfalls(int branchId,List<OrderItem> items)
-        {
-            var requiredQuantities = new Dictionary<int, double>();
-            foreach(var item in items)
-            {
-                var recipeItems = DataSeeder.RecipeItems.Where(ri => ri.MenuItemId == item.ItemId);
-                foreach(var recipeItem in recipeItems)
-                {
-                    if(!requiredQuantities.ContainsKey(recipeItem.IngredientId))
-                    {
-                        requiredQuantities[recipeItem.IngredientId] = 0;
-                    }
-                    requiredQuantities[recipeItem.IngredientId] += recipeItem.QuantityRequired * item.Quantity;
-                }
-            }
-            var shortfalls = new Dictionary<int, double>();
-            foreach(var (ingredientId, Quantity) in requiredQuantities)
-            {
-                var inventoryItem = DataSeeder.BranchInventories.FirstOrDefault(x => x.BranchId == branchId && x.IngredientId == ingredientId);
-                double availableQuantity = inventoryItem?.CurrentQuantity ?? 0;
-                if(availableQuantity < Quantity)
-                    shortfalls[ingredientId] = Quantity - availableQuantity;
-            }
-            return shortfalls;
-        }
-
-        public static void DeductInventory(int branchId, List<OrderItem> items)
+        public static bool IsSufficient(int branchId, List<OrderItem> items) => GetShortfalls(branchId, items).Count == 0;
+        private static Dictionary<int, double> GetRequiredQuantities(List<OrderItem> items)
         {
             var requiredQuantities = new Dictionary<int, double>();
             foreach (var item in items)
@@ -51,6 +26,27 @@ namespace Restaurant_Management_System.Services
                     requiredQuantities[recipeItem.IngredientId] += recipeItem.QuantityRequired * item.Quantity;
                 }
             }
+            return requiredQuantities;
+        }
+        public static Dictionary<int,double> GetShortfalls(int branchId,List<OrderItem> items)
+        {
+            var requiredQuantities = GetRequiredQuantities(items);
+
+            var shortfalls = new Dictionary<int, double>();
+            foreach(var (ingredientId, Quantity) in requiredQuantities)
+            {
+                var inventoryItem = DataSeeder.BranchInventories.FirstOrDefault(x => x.BranchId == branchId && x.IngredientId == ingredientId);
+                double availableQuantity = inventoryItem?.CurrentQuantity ?? 0;
+                if(availableQuantity < Quantity)
+                    shortfalls[ingredientId] = Quantity - availableQuantity;
+            }
+            return shortfalls;
+        }
+
+        public static void DeductInventory(int branchId, List<OrderItem> items)
+        {
+            var requiredQuantities = GetRequiredQuantities(items);
+
             foreach (var (ingredientId, quantity) in requiredQuantities)
             {
                 var inventoryItem = DataSeeder.BranchInventories.FirstOrDefault(x => x.BranchId == branchId && x.IngredientId == ingredientId);
@@ -65,7 +61,6 @@ namespace Restaurant_Management_System.Services
             }
         }
 
-        public static bool IsSufficient(int branchId, List<OrderItem> items) => GetShortfalls(branchId, items).Count == 0;
 
     }
 }
