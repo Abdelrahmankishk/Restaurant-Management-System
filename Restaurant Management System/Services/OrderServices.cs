@@ -141,5 +141,27 @@ namespace Restaurant_Management_System.Services
             Order.OrderStatus = OrderStatus.Preparing;
             return (true, "Order is being Prepared");
         }
-    }
+
+        public static (bool Success,string Message) ServeOrder(int OrderId, int ChefId)
+        {
+            var Order = DataSeeder.Orders.FirstOrDefault(i => i.OrderId == OrderId);
+            if (Order is null)
+                return (false, "Order not Found");
+
+            if (Order.OrderStatus != OrderStatus.Pending)
+                return (false, "Order must be in Pending Status");
+
+            var chef = DataSeeder.Employees.FirstOrDefault(i => i.EmployeeId == ChefId);
+            if (chef is null || chef is not Chef)
+                return (false, "Only Chef can prepare Orders");
+
+            if (!chef.AssignedBranchIds.Contains(Order.BranchId))
+                return (false, "Chef is not Assigned to this Branch");
+
+            Order.OrderStatus = OrderStatus.Served;
+            return (true, "Order Marked as Served");
+        }
+
+
+       }
 }
