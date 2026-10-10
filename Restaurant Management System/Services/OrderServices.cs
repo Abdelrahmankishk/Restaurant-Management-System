@@ -31,7 +31,7 @@ namespace Restaurant_Management_System.Services
             var branch = DataSeeder.Branches.FirstOrDefault(b => b.BranchId == BranchId);
             if (branch is null)
                 return (false, "Branch not found");
-            
+
             //3.Delivery orders require delivery address
             if (orderType == OrderType.Delivery && string.IsNullOrWhiteSpace(deliveryAddress))
                 return (false, "Delivery orders require a delivery address");
@@ -106,6 +106,40 @@ namespace Restaurant_Management_System.Services
             }
             return (true, $"Order placed successfully with OrderId {order.OrderId}");
 
+        }
+
+        public static (bool Success,string Message) StartPreparing(int OrderId,int ChefId,int? ManagerOverrideId = null)
+        {
+            var Order = DataSeeder.Orders.FirstOrDefault(i => i.OrderId == OrderId);
+            if (Order is null)
+                return (false, "Order not Found");
+
+            if (Order.OrderStatus != OrderStatus.Pending)
+                return (false, "Order must be in Pending Status");
+
+            var chef = DataSeeder.Employees.FirstOrDefault(i => i.EmployeeId == ChefId);
+            if (chef is null || chef is not Chef)
+                return (false, "Only Chef can prepare Orders");
+
+            if (!chef.AssignedBranchIds.Contains(Order.BranchId))
+                return (false, "Chef is not Assigned to this Branch");
+
+            bool isSufficient = InventoryServices.IsSufficient(Order.BranchId, Order.OrderItems);
+            if (!isSufficient)
+            {
+                if (ManagerOverrideId is null)
+                    return (false, "Insufficient Stock");
+
+                var Manager = DataSeeder.Employees.FirstOrDefault(i =>i.EmployeeId == ManagerOverrideId);
+                if (Manager is null || Manager is not BranchManager)
+                    return (false, "Override Denied : Not a branch Manager");
+
+                if (!Manager.AssignedBranchIds.Contains(Order.BranchId))
+                    return (false, "Override Denied : Manager is From Different Branch");
+            }
+            InventoryServices.DeductInventory(Order.BranchId, Order.OrderItems);
+            Order.OrderStatus = OrderStatus.Preparing;
+            return (true, "Order is being Prepared");
         }
     }
 }
