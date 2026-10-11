@@ -159,9 +159,34 @@ namespace Restaurant_Management_System.Services
                 return (false, "Chef is not Assigned to this Branch");
 
             Order.OrderStatus = OrderStatus.Served;
-            return (true, "Order Marked as Served");
+            return (true, "Order is being Served");
         }
 
+        public static (bool Success, string Message) ProcessPayment(int OrderId, int CashierId, PaymentMethod method)
+        {
+            var Order = DataSeeder.Orders.FirstOrDefault(i => i.OrderId == OrderId);
+            if (Order is null)
+                return (false, "Order not Found");
+            if (Order.OrderStatus != OrderStatus.Served)
+                return (false, "Order must be in Served Status");
 
-       }
+            var cashier = DataSeeder.Employees.FirstOrDefault(i => i.EmployeeId == CashierId);
+
+            if (cashier is null || cashier is not Cashier)
+                return (false, "Only Chef can prepare Orders");
+            if(!cashier.AssignedBranchIds.Contains(Order.BranchId))
+                return (false, "Cashier is not Assigned to this Branch");
+
+            Order.PaymentMethod = method;
+            Order.OrderStatus = OrderStatus.Completed;
+            var customer = DataSeeder.Customers.FirstOrDefault(c => c.CustomerId == Order.CustomerId);
+            if (customer is null)
+                return (false, "Error: Can not add Loyalty Points to the Customer");
+            int LoyaltyEarned = (int)Math.Floor(Order.TotalAmount);
+            customer.LoyaltyPoints = LoyaltyEarned;
+
+            return (true, $"Payment Proccessed via {method}; Customer earned {LoyaltyEarned} Loyalty Pionts");
+        }
+
+    }
 }
