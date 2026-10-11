@@ -188,5 +188,45 @@ namespace Restaurant_Management_System.Services
             return (true, $"Payment Proccessed via {method}; Customer earned {LoyaltyEarned} Loyalty Pionts");
         }
 
+        public static (bool Success, string Message) CancelOrder(int OrderId, int EmployeeId)
+        {
+            var Order = DataSeeder.Orders.FirstOrDefault(i => i.OrderId == OrderId);
+            if (Order is null)
+                return (false, "Order not Found");
+            if (Order.OrderStatus == OrderStatus.Completed)
+                return (false, "Order is Completed (Can Not be Canceled)");
+            if (Order.OrderStatus == OrderStatus.Cancelled)
+                return (false, "Order is Already Canceled");
+
+            var employee = DataSeeder.Employees.FirstOrDefault(e => e.EmployeeId == EmployeeId);
+            if (employee is null)
+                return (false, "Employee is Not Found");
+            if (!employee.AssignedBranchIds.Contains(Order.BranchId))
+                return (false, "Employee is Not Assigned to this Branch");
+
+            if (Order.OrderStatus == OrderStatus.Pending)
+            {
+                if (employee is not Waiter && employee is not Cashier && employee is not BranchManager)
+                    return (false, $"Employee {employee.FullName} ({employee.GetRole()}) is not allowed to Cancel Order");
+
+                Order.OrderStatus = OrderStatus.Cancelled;
+                return (true, $"Order Is Canceled by Employee {employee.FullName} ({employee.GetRole()})");
+            }
+            else
+            {
+                if(Order.OrderType == OrderType.Delivery)
+                {
+                    var delivery = DataSeeder.Deliveries.FirstOrDefault(i => i.OrderId == OrderId);
+                    if (delivery is not null && delivery.Status == DeliveryStatus.OnTheWay && delivery.DeliveryStaffId.HasValue)
+                        return (false, "Can Not Cancel Order: Order is Out for delivery");
+                }
+
+                if (employee is not BranchManager)
+                    return (false, $"Employee {employee.FullName} ({employee.GetRole()}) is not allowed to Cancel Order");
+
+                Order.OrderStatus = OrderStatus.Cancelled;
+                return (true, $"Order Is Cancled by Employee {employee.FullName} ({employee.GetRole()})");
+            }
+        }
     }
 }
