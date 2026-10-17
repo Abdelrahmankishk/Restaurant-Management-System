@@ -51,5 +51,33 @@ namespace Restaurant_Management_System.Services
             staff.IsAvailable = false;
             return (true, $"Delivery assigned to {staff.FullName}, Status: On The Way");
         }
+
+        public static (bool success, string message) MarkDelivered(int deliverId, int deliveryStaffId)
+        {
+            var delivery = DataSeeder.Deliveries.FirstOrDefault(d => d.DeliveryId == deliverId);
+            if (delivery == null)
+                return (false, "Delivery Record is Not Found");
+            if (delivery.Status != DeliveryStatus.OnTheWay)
+                return (false, "Delivery Can Not be Marked on Delivered");
+            if (delivery.DeliveryStaffId != deliveryStaffId)
+                return (false,"Only Assigned Delivery Staff Member can update this Deliver");
+
+            delivery.Status = DeliveryStatus.Delivered;
+            delivery.DeliveryTime = DateTime.Now;
+
+            var order = DataSeeder.Orders.FirstOrDefault(r=>r.OrderId == deliverId);
+            if (order != null)
+            {
+                order.OrderStatus = OrderStatus.Completed;
+                var customer = DataSeeder.Customers.FirstOrDefault(c => c.CustomerId == order.CustomerId);
+                if (customer != null)
+                    customer.LoyaltyPoints += (int)Math.Floor(order.TotalAmount);
+            }
+            var staff = DataSeeder.DeliveryStaffList.FirstOrDefault(d => d.StaffId == deliveryStaffId);
+            if (staff != null)
+                staff.IsAvailable = true;
+            return (true, $"Delivery {delivery.OrderId} is Delivered, Order {order!.OrderId} is Completed");
+        }
+
     }
 }
