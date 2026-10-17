@@ -60,7 +60,7 @@ namespace Restaurant_Management_System.Services
             if (delivery.Status != DeliveryStatus.OnTheWay)
                 return (false, "Delivery Can Not be Marked on Delivered");
             if (delivery.DeliveryStaffId != deliveryStaffId)
-                return (false,"Only Assigned Delivery Staff Member can update this Deliver");
+                return (false,"Only Assigned Delivery Staff Member can update this Delivery");
 
             delivery.Status = DeliveryStatus.Delivered;
             delivery.DeliveryTime = DateTime.Now;
@@ -79,5 +79,31 @@ namespace Restaurant_Management_System.Services
             return (true, $"Delivery {delivery.OrderId} is Delivered, Order {order!.OrderId} is Completed");
         }
 
+        public static (bool success, string message) MarkFailed(int deliverId, int deliveryStaffId, string FailureReason)
+        {
+            var delivery = DataSeeder.Deliveries.FirstOrDefault(d => d.DeliveryId == deliverId);
+            if (delivery == null)
+                return (false, "Delivery Record is Not Found");
+            if (delivery.Status != DeliveryStatus.OnTheWay)
+                return (false, "Delivery Can Not be Marked on Delivered");
+            if (delivery.DeliveryStaffId != deliveryStaffId)
+                return (false, "Only Assigned Delivery Staff Member can update this Delivery");
+
+            if (string.IsNullOrEmpty(FailureReason))
+                return (false,"Failure Reason is Required");
+
+            delivery.Status = DeliveryStatus.Failed;
+            delivery.FailureReason = FailureReason;
+            delivery.DeliveryTime = DateTime.Now;
+
+            var order = DataSeeder.Orders.FirstOrDefault(r => r.OrderId == deliverId);
+            if (order != null)
+                order.OrderStatus = OrderStatus.Cancelled;
+
+            var staff = DataSeeder.DeliveryStaffList.FirstOrDefault(d => d.StaffId == deliveryStaffId);
+            if (staff != null)
+                staff.IsAvailable = true;
+            return (true, $"Delivery {delivery.OrderId} Failed! Order {order!.OrderId} is Canceled");
+        }
     }
 }
