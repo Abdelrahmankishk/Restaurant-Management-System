@@ -128,7 +128,7 @@ namespace Restaurant_Management_System.Services
             if (!isSufficient)
             {
                 if (ManagerOverrideId is null)
-                    return (false, "Insufficient Stock");
+                    return (false, "INSUFFICIENT_STOCK");
 
                 var Manager = DataSeeder.Employees.FirstOrDefault(i =>i.EmployeeId == ManagerOverrideId);
                 if (Manager is null || Manager is not BranchManager)
