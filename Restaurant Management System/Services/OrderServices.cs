@@ -148,8 +148,8 @@ namespace Restaurant_Management_System.Services
             if (Order is null)
                 return (false, "Order not Found");
 
-            if (Order.OrderStatus != OrderStatus.Pending)
-                return (false, "Order must be in Pending Status");
+            if (Order.OrderStatus != OrderStatus.Preparing)
+                return (false, "Order must be in Preparing Status");
 
             var chef = DataSeeder.Employees.FirstOrDefault(i => i.EmployeeId == ChefId);
             if (chef is null || chef is not Chef)

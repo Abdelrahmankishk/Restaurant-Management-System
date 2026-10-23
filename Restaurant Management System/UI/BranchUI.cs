@@ -95,7 +95,7 @@ namespace Restaurant_Management_System.UI
                 foreach (var m in managers) ConsoleHelper.Info($"[{m.EmployeeId}] {m.FullName}");
                 managerId = ConsoleHelper.ReadInt("Assign Manager ID (0 to skip)", 0);
             }
-
+            var assignedMnager = DataSeeder.Employees.FirstOrDefault(e => e.EmployeeId == managerId);
             DataSeeder.Branches.Add(new Branch
             {
                 BranchId = newId,
@@ -103,7 +103,7 @@ namespace Restaurant_Management_System.UI
                 Address = address,
                 ContactNumber = contact,
                 OpeningHours = hours,
-                ManagerId = managerId
+                ManagerId = assignedMnager is BranchManager ? managerId : 0, 
             });
             ConsoleHelper.Success($"Branch '{name}' added with ID {newId}.");
             ConsoleHelper.Wait();

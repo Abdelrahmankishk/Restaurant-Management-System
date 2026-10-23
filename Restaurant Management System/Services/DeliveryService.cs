@@ -65,7 +65,7 @@ namespace Restaurant_Management_System.Services
             delivery.Status = DeliveryStatus.Delivered;
             delivery.DeliveryTime = DateTime.Now;
 
-            var order = DataSeeder.Orders.FirstOrDefault(r=>r.OrderId == deliverId);
+            var order = DataSeeder.Orders.FirstOrDefault(r=>r.OrderId == delivery.OrderId);
             if (order != null)
             {
                 order.OrderStatus = OrderStatus.Completed;

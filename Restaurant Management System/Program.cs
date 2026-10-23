@@ -1,10 +1,14 @@
-﻿namespace Restaurant_Management_System
+﻿using Restaurant_Management_System.Helpers;
+using Restaurant_Management_System.UI;
+
+namespace Restaurant_Management_System
 {
     internal class Program
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Restaurant Management System");
+            DataSeeder.Seed();
+            MainMenu.Run();
         }
     }
 }
